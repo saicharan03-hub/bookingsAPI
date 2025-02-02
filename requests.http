@@ -1,0 +1,162 @@
+GET http://localhost:3005/users/
+
+###
+
+POST http://localhost:3005/api/register
+Content-Type: application/json
+
+{
+  "username": "user123",
+  "email": "user123@example.com",
+  "password": "securepassword123"
+}
+
+
+###
+POST http://localhost:3005/api/login
+Content-Type: application/json
+
+{
+  "username": "user123",
+  "password": "securepassword123"
+}
+
+
+###
+
+POST http://localhost:3005/bookings
+Content-Type: application/json
+
+{
+    "userid": 2023,
+    "date": 29,
+    "slotid": 4,
+    "movieId": 4,
+    "seatid" : 5,
+    "theatreId": 29,
+    "slotid": 4
+}
+
+
+###
+GET http://localhost:3005/bookings
+
+
+
+###
+DELETE http://localhost:3005/delete-booking/6783a9f2f307943430d16b33
+______________________________________________________________________________________________
+###
+POST http://localhost:3005/api/orders
+Content-Type: application/json
+
+{
+  "user_id": "1",
+  "product_ids": ["string"],
+  "total_cost": "number",
+  "address": "string"
+}
+
+###
+GET http://localhost:3005/api/orders/1
+### 
+DELETE http://localhost:3005/api/orders
+
+_________________________________________________________
+### 
+GET http://localhost:3005/api/products
+###
+POST  http://localhost:3005/api/products
+Content-Type: application/json
+
+[
+  {
+    "title": "Product 1",
+    "category": "Category 1",
+    "price": 100,
+    "rating": 4.5,
+    "review":"Good Product",
+    "brand":"brand1",
+    "description": "The iPhone 15 is a smartphone with a stunning display and powerful performance.",
+    "imageUrl": "https://m.media-amazon.com/images/I/81dT7CUY6GL._AC_UF1000,1000_QL80_.jpg",
+        "stock": 120
+  },
+  {
+      "title": "Product 2",
+      "category": "Category 12",
+      "price": 1002,
+      "rating": 4.15,
+      "review":"Good Product",
+      "brand":"brand1",
+      "description": "The iPhone 15 is a smartphone with a stunning display and powerful performance.",
+      "imageUrl": "https://m.media-amazon.com/images/I/81dT7CUY6GL._AC_UF1000,1000_QL80_.jpg",
+        "stock": 120
+  }
+]
+
+###
+PUT http://localhost:3005/api/products/:id
+
+{
+  "title": "Product 2",
+  "price": 150,
+  "rating": 4.8
+}
+
+###
+DELETE  http://localhost:3005/api/products/:id
+###
+GET http://localhost:3005/api/products/:id
+___________________________________________________________________________________
+###
+POST http://localhost:3005/api/cart
+Content-Type: application/json
+
+{
+  "user_id": 2,
+  "product_id": 1012,
+  "title": "Product Title2",
+  "product_image": "image_url2",
+  "quantity": 22,
+  "price": 502
+}
+
+###
+GET http://localhost:3005/api/cart/2
+###
+DELETE http://localhost:3005/api/cart/679f4d6112312d44c7da0a6b
+###
+PUT  http://localhost:3005/api/cart/679f508b38d8fe62b7391111
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+###
+DELETE http://localhost:3005/api/cart/user/2
+###
+DELETE http://localhost:3005/api/cart
+###
+GET http://localhost:3005/api/cart/2/1012
+
+________________________________________________________________________
+###
+POST http://localhost:3005/api/wishlist
+Content-Type: application/json
+
+{
+  "user_id": 1,
+  "product_id": 101,
+  "title": "Product Title",
+  "price": 50,
+  "product_image": "image_url"
+}
+
+###
+GET http://localhost:3005/api/wishlist/1
+
+###
+DELETE http://localhost:3005/api/wishlist-item/679f51bec6514b0cc3a2bcfa
+###
+DELETE http://localhost:3005/api/wishlist/1
+
