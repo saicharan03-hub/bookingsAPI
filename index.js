@@ -1,4 +1,4 @@
-// require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
@@ -17,9 +17,25 @@ let bookingCollectionObj, usersCollectionObj, ordersCollection, cartCollectionOb
 app.use(express.json());
 app.use(cors({ origin: '*' }));
 
-// MongoDB Database Connection
 const uri = 'mongodb+srv://charan333gt:dxIFPPQ3MDGcc4DZ@cluster0.ezgqv.mongodb.net/';
 const client = new MongoClient(uri);
+
+
+const axios = require('axios');
+
+async function callApi() {
+  try {
+    const response = await axios.get('https://bookingsapi-wxkr.onrender.com/bookings');
+    // console.log('API Response:', response.data);
+  } catch (error) {
+    console.error('Error calling API:', error);
+  }
+}
+
+setInterval(callApi, 840000);
+
+callApi();
+
 
 client.connect()
   .then((client) => {
