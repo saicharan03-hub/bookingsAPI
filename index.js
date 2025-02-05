@@ -284,7 +284,7 @@ app.delete('/api/orders', async (req, res) => {
 // 1. GET all products with filtering and sorting
 app.get("/api/products", async (req, res) => {
   try {
-    const { page = 1, limit = 10, sortBy = "price", sortOrder = "asc", category, title_search, rating } = req.query;
+    const { page = 1, limit = 100, sortBy = "price", sortOrder = "asc", category, title_search, rating } = req.query;
 
     // Build the filters object dynamically based on the query parameters
     const filters = {};
