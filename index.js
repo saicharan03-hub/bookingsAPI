@@ -623,6 +623,7 @@ app.post('/api/wishlist', async (req, res) => {
 // Get all items in the wishlist for a specific user
 app.get('/api/wishlist/:user_id', async (req, res) => {
   let userId = req.params.user_id; // Get user_id from URL parameters
+  console.log(userId)
 
   if (!userId) {
     return res.status(400).json({ error: 'Invalid or missing user_id' });
@@ -630,7 +631,7 @@ app.get('/api/wishlist/:user_id', async (req, res) => {
 
   try {
     // Ensure `user_id` is stored in the correct data type (e.g., Number)
-    userId = Number(userId); // Convert string to Number
+    
 
     // Fetch wishlist items
     const wishlistItems = await wishListCollectionObj.find({ user_id: userId }).toArray(); // Convert cursor to array

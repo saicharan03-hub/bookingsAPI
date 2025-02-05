@@ -130,7 +130,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3005/api/cart/2
+GET http://localhost:3005/api/cart/
 ###
 DELETE http://localhost:3005/api/cart/679f4d6112312d44c7da0a6b
 ###
@@ -161,7 +161,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3005/api/wishlist/1
+GET http://localhost:3005/api/wishlist/67a2ff581b421c266fd8db49
 
 ###
 DELETE http://localhost:3005/api/wishlist-item/679f51bec6514b0cc3a2bcfa
