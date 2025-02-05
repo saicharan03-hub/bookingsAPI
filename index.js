@@ -623,18 +623,18 @@ app.post('/api/wishlist', async (req, res) => {
 // Get all items in the wishlist for a specific user
 app.get('/api/wishlist/:user_id', async (req, res) => {
   let userId = req.params.user_id; // Get user_id from URL parameters
-  console.log(userId)
+  console.log(typeof(userId))
 
   if (!userId) {
     return res.status(400).json({ error: 'Invalid or missing user_id' });
   }
 
   try {
-    // Ensure `user_id` is stored in the correct data type (e.g., Number)
+    
     
 
     // Fetch wishlist items
-    const wishlistItems = await wishListCollectionObj.find({ user_id: userId }).toArray(); // Convert cursor to array
+    const wishlistItems = await wishListCollectionObj.find({ user_id: userId }).toArray(); 
 
     if (wishlistItems.length === 0) {
       return res.status(200).json({ message: 'No items in wishlist' });
@@ -683,8 +683,7 @@ app.delete('/api/wishlist/:user_id', async (req, res) => {
   }
 
   try {
-    // Convert userId to an integer (if it's not already)
-    const userIdentifier = parseInt(userId);
+    
 
     // Check if the conversion resulted in a valid integer
     if (isNaN(userIdentifier)) {
