@@ -3,7 +3,6 @@ const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 const app = express();
-const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -84,6 +83,20 @@ app.post('/bookings', async (req, res) => {
   }
 });
 
+// ////get booked seats for particular date,movie,theatre,slot
+// app.get('/bookings/:activemovie/:date/:slotId/:theatreid', async (req, res) => {
+//   try {
+//     const { activemovie, date, slotId, theatreid } = req.params;
+//     const query = { movieid: activemovie, date, slotid: slotId, theatreId: theatreid };
+    
+//     const bookings = await Booking.find(query);
+//     res.json(bookings);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+
 // GET Endpoint: Fetch bookings for a specific user
 app.get('/bookings/user/:userId', async (req, res) => {
   const { userId } = req.params;
@@ -152,35 +165,52 @@ app.post('/api/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await usersCollectionObj.insertOne({ username, email, password: hashedPassword });
     const token = jwt.sign({ id: result.insertedId, username }, SECRET_KEY, { expiresIn: '30d' });
-    res.status(201).json({ message: 'Account created successfully', jwt_token: token });
+    res.status(201).json({id: result.insertedId, message: 'Account created successfully', jwt_token: token });
   } catch (err) {
     console.error('Error registering user:', err);
     res.status(500).json({ message: 'Error creating account' });
   }
 });
 
-// User Login
+
 app.post('/api/login', async (req, res) => {
+  console.log("Received Request Body:", req.body);  // Debugging
+
+  if (!req.body || typeof req.body !== 'object') {
+    return res.status(400).json({ message: "Invalid JSON format" });
+  }
+
   const { username, password } = req.body;
+
   if (!username || !password) {
     return res.status(400).json({ message: 'Username and password are required' });
   }
+
   try {
     const user = await usersCollectionObj.findOne({ username });
     if (!user) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
+
     const token = jwt.sign({ id: user._id, username: user.username }, SECRET_KEY, { expiresIn: '30d' });
-    res.status(200).json({ jwt_token: token, id: user._id });
+
+    return res.status(200).json({
+      id: user._id,
+      message: 'Login successful',
+      jwt_token: token
+    });
   } catch (err) {
     console.error('Error logging in:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
 
 
 
@@ -553,7 +583,7 @@ app.get("/api/cart/:user_id/:product_id", async (req, res) => {
 // Add item to wishlist
 app.post('/api/wishlist', async (req, res) => {
   const { user_id, product_id, title, price, product_image } = req.body;
-
+  
   // Validate required fields
   if (!user_id || !product_id || !title || !price || !product_image) {
     return res.status(400).json({ error: "All fields are required" });

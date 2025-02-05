@@ -12,6 +12,8 @@ Content-Type: application/json
 }
 
 
+
+
 ###
 POST http://localhost:3005/api/login
 Content-Type: application/json
@@ -21,7 +23,7 @@ Content-Type: application/json
   "password": "securepassword123"
 }
 
-
+__________________________________________________________________________________________
 ###
 
 POST http://localhost:3005/bookings
@@ -36,6 +38,12 @@ Content-Type: application/json
     "theatreId": 29,
     "slotid": 4
 }
+
+###
+//GET http://localhost:3005/api/bookings/:activemovie/:date/:slotId/:theatreid
+//GET http://localhost:3005/api/bookings/1/2025-02-03/4:00 PM/T001
+GET  http://localhost:3005/bookings/filter?userid=1&date=2025-02-03&slotid=4:00%20PM&movieid=1&theatreid=T001 
+
 
 
 ###
