@@ -281,52 +281,51 @@ app.delete('/api/orders', async (req, res) => {
 
 
 
-// 1. GET all products with filtering and sorting
+// 1. GET all products with filtering and optional sorting
 app.get("/api/products", async (req, res) => {
   try {
-    const { page = 1, limit = 10, sortBy = "price", sortOrder = "asc", category, title_search, rating } = req.query;
+    const { page = 1, limit = 100, sortBy, category, title_search, rating } = req.query;
 
-    // Build the filters object dynamically based on the query parameters
+    // Build the filters object dynamically
     const filters = {};
 
-    // Filter by category
-    if (category) {
-      filters.category = category;
-    }
+    if (category) filters.category = category;
+    if (title_search) filters.title = { $regex: new RegExp(title_search, "i") };
+    if (rating) filters.rating = { $gte: Number(rating) };
 
-    // Filter by title search (case-insensitive)
-    if (title_search) {
-      filters.title = { $regex: new RegExp(title_search, "i") }; // Case-insensitive regex search
-    }
-
-    // Filter by rating
-    if (rating) {
-      filters.rating = { $gte: Number(rating) }; // Assume rating is a numeric value
-    }
-
-    // Set up pagination and sorting
-    const skip = (page - 1) * limit;
+    // Sorting logic (only apply sorting if `sortBy` is provided)
     const sort = {};
-    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
+    if (sortBy === "hightolow") {
+      sort.price = -1; // High to low
+    } else if (sortBy === "lowtohigh") {
+      sort.price = 1; // Low to high
+    }
 
-    // Query the products collection
-    const products = await productsCollectionObj.find(filters)
-      .skip(skip)
-      .limit(Number(limit))
-      .sort(sort)
-      .toArray();
+    const skip = (Number(page) - 1) * Number(limit);
+    
+    // Fetch products from MongoDB
+    let query = productsCollectionObj.find(filters).skip(skip).limit(Number(limit));
+
+    // Apply sorting only if a sorting option is provided
+    if (Object.keys(sort).length > 0) {
+      query = query.sort(sort);
+    }
+
+    const products = await query.toArray();
 
     if (products.length === 0) {
-      return res.status(404).json({ message: "No products found" });
+      return res.status(200).json({ products: [], message: "No products found" });
     }
 
-    // Send the response
     res.status(200).json({ products });
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     res.status(500).json({ error: "Failed to fetch products" });
   }
 });
+
+
+
 
 
 
