@@ -284,7 +284,7 @@ app.delete('/api/orders', async (req, res) => {
 // 1. GET all products with filtering and optional sorting
 app.get("/api/products", async (req, res) => {
   try {
-    const { page = 1, limit = 100, sortBy, category, title_search, rating } = req.query;
+    const { page = 1, limit = 100, sortBy = "hightolow", category, title_search, rating } = req.query;
 
     // Build the filters object dynamically
     const filters = {};
@@ -293,25 +293,20 @@ app.get("/api/products", async (req, res) => {
     if (title_search) filters.title = { $regex: new RegExp(title_search, "i") };
     if (rating) filters.rating = { $gte: Number(rating) };
 
-    // Sorting logic (only apply sorting if `sortBy` is provided)
-    const sort = {};
-    if (sortBy === "hightolow") {
-      sort.price = -1; // High to low
-    } else if (sortBy === "lowtohigh") {
-      sort.price = 1; // Low to high
+    // Sorting logic - Default to high-to-low price sorting
+    const sort = { price: -1 }; // Default sorting: High to Low
+    if (sortBy === "lowtohigh") {
+      sort.price = 1; // Change to Low to High if specified
     }
 
     const skip = (Number(page) - 1) * Number(limit);
     
     // Fetch products from MongoDB
-    let query = productsCollectionObj.find(filters).skip(skip).limit(Number(limit));
-
-    // Apply sorting only if a sorting option is provided
-    if (Object.keys(sort).length > 0) {
-      query = query.sort(sort);
-    }
-
-    const products = await query.toArray();
+    const products = await productsCollectionObj.find(filters)
+      .skip(skip)
+      .limit(Number(limit))
+      .sort(sort)
+      .toArray();
 
     if (products.length === 0) {
       return res.status(200).json({ products: [], message: "No products found" });
@@ -323,6 +318,7 @@ app.get("/api/products", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch products" });
   }
 });
+
 
 
 
