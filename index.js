@@ -288,7 +288,9 @@ app.get("/api/products", async (req, res) => {
     const filters = {};
     if (category) filters.category = category;
     if (title_search) filters.title = { $regex: new RegExp(title_search, "i") };
-    if (rating) filters.rating = { $gte: Number(rating) };
+    if (rating && !isNaN(rating)) {
+      filters.rating = { $gte: parseFloat(rating) }; // Fix: Ensure proper numeric filtering
+    }
 
     // Fix sorting logic to match frontend request keys
     const sort = { price: sortBy === "PRICE_LOW" ? 1 : -1 };
@@ -311,6 +313,7 @@ app.get("/api/products", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch products" });
   }
 });
+
 
 
 
