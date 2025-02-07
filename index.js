@@ -281,27 +281,20 @@ app.delete('/api/orders', async (req, res) => {
 
 
 
-// 1. GET all products with filtering and optional sorting
 app.get("/api/products", async (req, res) => {
   try {
-    const { page = 1, limit = 100, sortBy = "hightolow", category, title_search, rating } = req.query;
+    const { page = 1, limit = 100, sortBy = "PRICE_HIGH", category, title_search, rating } = req.query;
 
-    // Build the filters object dynamically
     const filters = {};
-
     if (category) filters.category = category;
     if (title_search) filters.title = { $regex: new RegExp(title_search, "i") };
     if (rating) filters.rating = { $gte: Number(rating) };
 
-    // Sorting logic - Default to high-to-low price sorting
-    const sort = { price: -1 }; // Default sorting: High to Low
-    if (sortBy === "lowtohigh") {
-      sort.price = 1; // Change to Low to High if specified
-    }
+    // Fix sorting logic to match frontend request keys
+    const sort = { price: sortBy === "PRICE_LOW" ? 1 : -1 };
 
     const skip = (Number(page) - 1) * Number(limit);
     
-    // Fetch products from MongoDB
     const products = await productsCollectionObj.find(filters)
       .skip(skip)
       .limit(Number(limit))
@@ -318,7 +311,6 @@ app.get("/api/products", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch products" });
   }
 });
-
 
 
 
