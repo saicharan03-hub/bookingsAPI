@@ -66,13 +66,18 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3005/api/orders/1
+GET http://localhost:3005/api/orders/67a2ff581b421c266fd8db49
 ### 
 DELETE http://localhost:3005/api/orders
 
 _________________________________________________________
 ### 
-GET http://localhost:3005/api/products
+GET http://localhost:3005/api/products?sortBy=PRICE_HIGH&category=Electronics&title_search=&rating=4
+
+
+###
+GET http://localhost:3005/api/fix-products-data
+
 ###
 POST  http://localhost:3005/api/products
 Content-Type: application/json
@@ -114,7 +119,8 @@ PUT http://localhost:3005/api/products/:id
 ###
 DELETE  http://localhost:3005/api/products/:id
 ###
-GET http://localhost:3005/api/products/:id
+GET http://localhost:3005/api/products/67b03de9a4fc663183b4877b
+
 ___________________________________________________________________________________
 ###
 POST http://localhost:3005/api/cart
