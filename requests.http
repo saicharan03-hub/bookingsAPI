@@ -239,7 +239,7 @@ grapher-id: 67aca0a15d388d3d83171e0b
 ###
 GET http://localhost:3005/api/grapher/bookings
 Content-Type: application/json
-grapher-id: 67aba4e9be98d05970c62a8a
+grapher-id: 67b2d5a3e876fb43d77f9921
 
 ### Fetch booked photographers for an organizer
 GET http://localhost:3005/api/organizer/booked-graphers

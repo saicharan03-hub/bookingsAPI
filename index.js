@@ -291,31 +291,44 @@ app.delete('/api/orders', async (req, res) => {
 
 
 
+const client = require("./config/redisClient"); // Import Redis client
+
 app.get("/api/products", async (req, res) => {
   try {
     const { page = 1, limit = 100, sortBy = "PRICE_HIGH", category, title_search, rating } = req.query;
 
     const filters = {};
     if (category) filters.category = category;
-    if (title_search) filters.title = { $regex: new RegExp(title_search, "i") };
-    if (rating && !isNaN(rating)) {
-      filters.rating = { $gte: parseFloat(rating) }; // Fix: Ensure proper numeric filtering
+    if (title_search) filters.$text = { $search: title_search }; // Faster search using text index
+    if (rating && !isNaN(rating)) filters.rating = { $gte: parseFloat(rating) };
+
+    const sortOptions = {
+      PRICE_HIGH: { price: -1 },
+      PRICE_LOW: { price: 1 },
+      RATING_HIGH: { rating: -1 },
+      RATING_LOW: { rating: 1 },
+      RELEVANT: { score: { $meta: "textScore" } }
+    };
+    const sort = sortOptions[sortBy] || { price: -1 };
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // 🔹 Check Redis Cache First
+    const cacheKey = `products:${JSON.stringify(req.query)}`;
+    const cachedData = await client.get(cacheKey);
+    if (cachedData) {
+      console.log("✅ Cache Hit");
+      return res.status(200).json(JSON.parse(cachedData));
     }
 
-    // Fix sorting logic to match frontend request keys
-    const sort = { price: sortBy === "PRICE_LOW" ? 1 : -1 };
-
-    const skip = (Number(page) - 1) * Number(limit);
-    
+    // 🔹 Fetch from MongoDB
     const products = await productsCollectionObj.find(filters)
       .skip(skip)
       .limit(Number(limit))
       .sort(sort)
       .toArray();
 
-    if (products.length === 0) {
-      return res.status(200).json({ products: [], message: "No products found" });
-    }
+    // 🔹 Store in Redis Cache (Expires in 1 Hour)
+    await client.setex(cacheKey, 3600, JSON.stringify(products));
 
     res.status(200).json({ products });
   } catch (error) {
