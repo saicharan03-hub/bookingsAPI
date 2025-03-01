@@ -291,7 +291,7 @@ app.delete('/api/orders', async (req, res) => {
 
 
 
-const client = require("./config/redisClient"); // Import Redis client
+const client = require("./redisClient"); // Import Redis client
 
 app.get("/api/products", async (req, res) => {
   try {
