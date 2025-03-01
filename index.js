@@ -183,40 +183,49 @@ app.post('/api/register', async (req, res) => {
 });
 
 
+
+
+// User Login
 app.post('/api/login', async (req, res) => {
-  console.log("Received Request Body:", req.body);  // Debugging
+  console.log("Received Request Body:", req.body);
 
   if (!req.body || typeof req.body !== 'object') {
-    return res.status(400).json({ message: "Invalid JSON format" });
+      return res.status(400).json({ message: "Invalid JSON format" });
   }
 
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password are required' });
+      return res.status(400).json({ message: 'Mobile and password are required' });
   }
 
   try {
-    const user = await usersCollectionObj.findOne({ username });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid username or password' });
-    }
+      const user = await usersCollectionObj.findOne({ username: username });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid username or password' });
-    }
+      if (!user) {
+          return res.status(401).json({ message: 'Invalid mobile number or password' });
+      }
 
-    const token = jwt.sign({ id: user._id, username: user.username }, SECRET_KEY, { expiresIn: '30d' });
+      console.log("Stored Hashed Password:", user.password);
+      console.log("Entered Password:", password);
 
-    return res.status(200).json({
-      id: user._id,
-      message: 'Login successful',
-      jwt_token: token
-    });
+      const isMatch = await bcrypt.compare(password, user.password);
+      console.log("Password Match:", isMatch);
+
+      if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid mobile number or password' });
+      }
+
+      const token = jwt.sign({ id: user._id, name:user.name, role: user.role }, SECRET_KEY, { expiresIn: '30d' });
+
+      return res.status(200).json({
+          id: user._id,
+          message: 'Login successful',
+          jwt_token: token
+      });
   } catch (err) {
-    console.error('Error logging in:', err);
-    return res.status(500).json({ message: 'Internal server error' });
+      console.error('Error logging in:', err);
+      return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
