@@ -291,7 +291,7 @@ app.delete('/api/orders', async (req, res) => {
 
 
 
-const client = require("./redisClient"); // Import Redis client
+const redisClient  = require("./redisClient"); // Import Redis client
 
 app.get("/api/products", async (req, res) => {
   try {
@@ -314,7 +314,7 @@ app.get("/api/products", async (req, res) => {
 
     // 🔹 Check Redis Cache First
     const cacheKey = `products:${JSON.stringify(req.query)}`;
-    const cachedData = await client.get(cacheKey);
+    const cachedData = await redisClient .get(cacheKey);
     if (cachedData) {
       console.log("✅ Cache Hit");
       return res.status(200).json(JSON.parse(cachedData));
@@ -328,7 +328,7 @@ app.get("/api/products", async (req, res) => {
       .toArray();
 
     // 🔹 Store in Redis Cache (Expires in 1 Hour)
-    await client.setex(cacheKey, 3600, JSON.stringify(products));
+    await redisClient .setex(cacheKey, 3600, JSON.stringify(products));
 
     res.status(200).json({ products });
   } catch (error) {
