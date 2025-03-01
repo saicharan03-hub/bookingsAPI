@@ -174,3 +174,91 @@ DELETE http://localhost:3005/api/wishlist-item/679f51bec6514b0cc3a2bcfa
 ###
 DELETE http://localhost:3005/api/wishlist/1
 
+____________________________________________________________________________
+//GRAPHER HIRE
+
+###
+GET http://localhost:3005/api/members?unionId=sbs1234&mobile=9959947115
+
+
+###
+POST http://localhost:3005/apigh/register
+Content-Type: application/json
+
+{
+  "district": "Jagtial",
+  "email": "saicharan@sfbgfhjhm",
+  "mobile": "3456789",
+  "name": "SAICHARAN THOORPATI SCT",
+  "organizationName": "Sri Brother",
+  "password": "saicharan123",
+  "role": "organizer",
+  "typeOfGrapher": "",
+  "unionId": "456gy67u"
+}
+
+
+###
+POST  http://localhost:3005/apigh/login
+Content-Type: application/json
+
+{
+    "mobile":"9182363802",
+    "password":"12345"
+}
+
+
+###
+GET http://localhost:3005/api/users/grapher
+
+
+###
+POST http://localhost:3005/api/bookings/request
+Content-Type: application/json
+
+{
+    "grapherId":"67aba4e9be98d05970c62a8a",
+    "organizerName":"Sri Brother",
+    "date":"2025-02-12"
+}
+
+###
+GET http://localhost:3005/api/grapher/job-requests?grapherId=67aba53cbe98d05970c62a8b
+
+
+### Job Response API - Accept Job
+POST http://localhost:3005/api/grapher/job-response
+Content-Type: application/json
+grapher-id: 67aca0a15d388d3d83171e0b
+
+{
+    "id": "67b2cbd5e1475e3b3578853a",
+    "status": "accepted"
+}
+
+###
+GET http://localhost:3005/api/grapher/bookings
+Content-Type: application/json
+grapher-id: 67aba4e9be98d05970c62a8a
+
+### Fetch booked photographers for an organizer
+GET http://localhost:3005/api/organizer/booked-graphers
+Content-Type: application/json
+organizer-name: "Sri Brother"
+
+
+### Update Photographer's Portfolio and Instagram### Update Grapher Profile
+POST http://localhost:3005/api/grapher/update
+Content-Type: application/json
+
+{
+  "grapherId": "67aba4e9be98d05970c62a8a",
+  "portfolio": "https://myportfolio.com",
+  "instagram":"instagram.com"
+  
+}
+
+____________________________________________________________________________________-
+
+// PORTFOLIO SERVER
+

@@ -11,9 +11,9 @@ const nodemailer = require("nodemailer");
 const SECRET_KEY = process.env.SECRET_KEY;
 
 
-const PORT = 3006;
-let db1, db2;
-let bookingCollectionObj, usersCollectionObj, ordersCollection, cartCollectionObj, wishListCollectionObj, productsCollectionObj;
+const PORT = 3005;
+let db1, db2,db3;
+let bookingCollectionObj, usersCollectionObj, usersCollectionObj_GrapherHire, ordersCollection, cartCollectionObj, wishListCollectionObj, productsCollectionObj,UnionDBCollectionObj;
 
 app.use(express.json());
 app.use(cors({ origin: '*' }));
@@ -53,9 +53,9 @@ client.connect()
     wishListCollectionObj = db2.collection('wishlist');
     productsCollectionObj = db2.collection('products');
 
-    db = client.db('GrapherHireDB');
-    usersCollectionObj = db.collection('users');
-    UnionDBCollectionObj = db.collection('UnionDB');
+    db3 = client.db('GrapherHireDB');
+    usersCollectionObj_GrapherHire = db3.collection('users');
+    UnionDBCollectionObj = db3.collection('UnionDB');
 
     console.log('Connected to MongoDB database');
   })
@@ -751,7 +751,7 @@ app.post('/apigh/register', async (req, res) => {
       };
       console.log(newUser)
       
-      const result = await usersCollectionObj.insertOne(newUser);
+      const result = await usersCollectionObj_GrapherHire.insertOne(newUser);
       
       const token = jwt.sign({ id: result.insertedId, name, role }, SECRET_KEY, { expiresIn: '30d' });
       
@@ -783,7 +783,7 @@ app.post('/apigh/login', async (req, res) => {
   }
 
   try {
-      const user = await usersCollectionObj.findOne({ mobile: mobile });
+      const user = await usersCollectionObj_GrapherHire.findOne({ mobile: mobile });
 
       if (!user) {
           return res.status(401).json({ message: 'Invalid mobile number or password' });
@@ -818,6 +818,9 @@ app.post('/apigh/login', async (req, res) => {
 
 
 
+
+
+
 //_______________________________________________________________________________________________
 
 
@@ -826,7 +829,7 @@ app.get("/api/users/:role", async (req, res) => {
   try {
       const { role } = req.params;
       console.log(role)
-      const users = await usersCollectionObj.find({ role }).toArray(); // Convert cursor to array
+      const users = await usersCollectionObj_GrapherHire.find({ role }).toArray(); // Convert cursor to array
       res.status(200).json(users);
   } catch (error) {
       console.error("Error fetching users by role:", error);
@@ -872,7 +875,7 @@ app.post('/api/bookings/request', async (req, res) => {
   }
 
   try {
-      const grapher = await usersCollectionObj.findOne({ _id: new ObjectId(grapherId), role: "grapher" });
+      const grapher = await usersCollectionObj_GrapherHire.findOne({ _id: new ObjectId(grapherId), role: "grapher" });
 
       if (!grapher) {
           return res.status(404).json({ message: "Grapher not found" });
@@ -882,7 +885,7 @@ app.post('/api/bookings/request', async (req, res) => {
       const requestId = new ObjectId();
 
       // Add the booking request to the grapher's request list with an ID
-      await usersCollectionObj.updateOne(
+      await usersCollectionObj_GrapherHire.updateOne(
           { _id: new ObjectId(grapherId) },
           { $push: { requests: { _id: requestId, organizerName, date } } }
       );
@@ -904,7 +907,7 @@ app.get('/api/grapher/job-requests', async (req, res) => {
       return res.status(400).json({ message: 'Grapher ID is required' });
   }
   try {
-      const grapher = await usersCollectionObj.findOne({ _id: new ObjectId(grapherId) });
+      const grapher = await usersCollectionObj_GrapherHire.findOne({ _id: new ObjectId(grapherId) });
       if (!grapher) {
           return res.status(404).json({ message: 'Grapher not found' });
       }
@@ -928,7 +931,7 @@ app.post('/api/grapher/job-response', async (req, res) => {
 
   try {
       // Find the grapher in the database
-      const grapher = await usersCollectionObj.findOne({ _id: new ObjectId(grapherId) });
+      const grapher = await usersCollectionObj_GrapherHire.findOne({ _id: new ObjectId(grapherId) });
       if (!grapher) {
           return res.status(404).json({ message: "Grapher not found" });
       }
@@ -944,7 +947,7 @@ app.post('/api/grapher/job-response', async (req, res) => {
       
 
       // Find the organizer in the database
-      const organizer = await usersCollectionObj.findOne({ name: organizerName });
+      const organizer = await usersCollectionObj_GrapherHire.findOne({ name: organizerName });
       if (!organizer) {
           return res.status(404).json({ message: "Organizer not found" });
       }
@@ -952,20 +955,20 @@ app.post('/api/grapher/job-response', async (req, res) => {
 
       if (status === "accepted") {
           // Add booking details to the organizer's data
-          await usersCollectionObj.updateOne(
+          await usersCollectionObj_GrapherHire.updateOne(
               { _id: new ObjectId(organizer._id) },
               { $push: { bookings: { id: new ObjectId(id), date, grapher: grapher.name } } }
           );
 
           // Add confirmed job to the grapher's data
-          await usersCollectionObj.updateOne(
+          await usersCollectionObj_GrapherHire.updateOne(
               { _id: new ObjectId(grapherId) },
               { $push: { confirmedJobs: { id: new ObjectId(id), date, organizer: organizer.organizationName } } }
           );
       }
       console.log(organizer)
       // Remove the job request from the grapher's list
-      await usersCollectionObj.updateOne(
+      await usersCollectionObj_GrapherHire.updateOne(
           { _id: new ObjectId(grapherId) },
           { $pull: { requests: { _id: new ObjectId(id) } } }
       );
@@ -988,7 +991,7 @@ app.get('/api/grapher/bookings', async (req, res) => {
       return res.status(400).json({ message: 'Grapher ID is required' });
   }
   try {
-      const grapher = await usersCollectionObj.findOne({ _id: new ObjectId(grapherId) });
+      const grapher = await usersCollectionObj_GrapherHire.findOne({ _id: new ObjectId(grapherId) });
       if (!grapher) {
           return res.status(404).json({ message: 'Grapher not found' });
       }
@@ -1014,7 +1017,7 @@ app.get('/api/organizer/booked-graphers', async (req, res) => {
   console.log("Organizer Name:", organizerName.replace(/^"|"$/g, ''));
 
   try {
-      const organizer = await usersCollectionObj.findOne({
+      const organizer = await usersCollectionObj_GrapherHire.findOne({
           name: organizerName.replace(/^"|"$/g, ''),
           role: "organizer"
       });
@@ -1039,7 +1042,7 @@ app.get('/api/:grapherId/booked-dates', async (req, res) => {
       return res.status(400).json({ message: 'Grapher ID is required' });
   }
   try {
-      const grapher = await usersCollectionObj.findOne({ _id: new ObjectId(grapherId) });
+      const grapher = await usersCollectionObj_GrapherHire.findOne({ _id: new ObjectId(grapherId) });
       if (!grapher) {
           return res.status(404).json({ message: 'Grapher not found' });
       }
@@ -1066,7 +1069,7 @@ app.post('/api/grapher/update', async (req, res) => {
       const objectId = new ObjectId(grapherId);
 
       // Ensure the fields exist as arrays
-      await usersCollectionObj.updateOne(
+      await usersCollectionObj_GrapherHire.updateOne(
           { _id: objectId },
           {
               $setOnInsert: { portfolio: [], instagram: [] }
@@ -1080,7 +1083,7 @@ app.post('/api/grapher/update', async (req, res) => {
       if (instagram) updateFields.instagram = instagram;
 
       // Update Grapher's profile
-      const updatedGrapher = await usersCollectionObj.findOneAndUpdate(
+      const updatedGrapher = await usersCollectionObj_GrapherHire.findOneAndUpdate(
           { _id: grapherId },
           { 
               $push: {
@@ -1113,7 +1116,7 @@ app.get('/api/grapher/profile', async (req, res) => {
       return res.status(400).json({ message: 'Grapher ID is required' });
   }
   try {
-      const grapher = await usersCollectionObj.findOne({ _id: new ObjectId(grapherId) });
+      const grapher = await usersCollectionObj_GrapherHire.findOne({ _id: new ObjectId(grapherId) });
       if (!grapher) {
           return res.status(404).json({ message: 'Grapher not found' });
       }
