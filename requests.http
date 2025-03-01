@@ -261,4 +261,12 @@ Content-Type: application/json
 ____________________________________________________________________________________-
 
 // PORTFOLIO SERVER
+###
+POST http://localhost:3005/send
+Content-Type: application/json
 
+{
+  "name": "John Doe",
+  "email": "johndoe@example.com",
+  "message": "Hello! I'm interested in your services."
+}
